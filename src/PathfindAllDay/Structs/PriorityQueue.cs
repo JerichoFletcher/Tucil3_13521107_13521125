@@ -5,12 +5,14 @@ namespace PathfindAllDay.Structs {
         private readonly T[] _buffer;
 
         public int Capacity => _buffer.Length;
+        public bool IsMinHeap { get; }
         public int Count { get; private set; }
 
-        public PriorityQueue(int capacity) {
+        public PriorityQueue(int capacity, bool minHeap = false) {
             if(capacity < 0)throw new ArgumentOutOfRangeException(nameof(capacity));
 
             _buffer = new T[capacity];
+            IsMinHeap = minHeap;
             Count = 0;
         }
 
@@ -24,9 +26,26 @@ namespace PathfindAllDay.Structs {
             return element.Equals(_buffer[element.QueueIndex]);
         }
 
+        public bool Any(Predicate<T> pred) {
+            if(pred == null) throw new ArgumentNullException();
+            foreach(T element in _buffer) if(pred(element)) return true;
+            return false;
+        }
+
+        public bool All(Predicate<T> pred) {
+            if(pred == null) throw new ArgumentNullException();
+            foreach(T element in _buffer) if(!pred(element)) return false;
+            return true;
+        }
+
+        public T Find(Predicate<T> pred) {
+            if(pred == null) throw new ArgumentNullException();
+            foreach(T element in _buffer) if(pred(element)) return element;
+            return default;
+        }
+
         public bool TryEnqueue(T element) {
-            if(element == null)throw new ArgumentNullException();
-            if(Count == Capacity) return false;
+            if(Contains(element) || Count == Capacity) return false;
 
             (_buffer[Count] = element).QueueIndex = Count;
             SortUp(element);
@@ -54,7 +73,8 @@ namespace PathfindAllDay.Structs {
             
             while(parentIndex >= 0) {
                 T parentItem = _buffer[parentIndex];
-                if(element.CompareTo(parentItem) > 0) {
+                int compare = element.CompareTo(parentItem);
+                if(!IsMinHeap ? compare > 0 : compare < 0) {
                     Swap(element, parentItem);
                 } else {
                     return;
@@ -72,12 +92,14 @@ namespace PathfindAllDay.Structs {
                 if(childIndexLeft < Count) {
                     swapIndex = childIndexLeft;
                     if(childIndexRight < Count) {
-                        if(_buffer[childIndexLeft].CompareTo(_buffer[childIndexRight]) < 0) {
+                        int compareChild = _buffer[childIndexLeft].CompareTo(_buffer[childIndexRight]);
+                        if(!IsMinHeap ? compareChild < 0 : compareChild > 0) {
                             swapIndex = childIndexRight;
                         }
                     }
 
-                    if(element.CompareTo(_buffer[swapIndex]) < 0) {
+                    int compare = element.CompareTo(_buffer[swapIndex]);
+                    if(!IsMinHeap ? compare < 0 : compare > 0) {
                         Swap(element, _buffer[swapIndex]);
                     } else {
                         return;
