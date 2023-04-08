@@ -12,17 +12,20 @@ namespace PathfindAllDay.Structs {
         /// <summary>The maximum capacity of the queue.</summary>
         public int Capacity => _buffer.Length;
         /// <summary>The number of items in the queue.</summary>
+        public bool IsMinHeap { get; }
         public int Count { get; private set; }
 
         /// <summary>
-        /// Constructs an empty queue with the given maximum capacity.
+        /// Constructs an empty queue.
         /// </summary>
         /// <param name="capacity">The maximum capacity of the queue.</param>
+        /// <param name="minHeap">Whether to sort the queue using min-heap rule.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="capacity"/> is negative.</exception>
-        public PriorityQueue(int capacity) {
+        public PriorityQueue(int capacity, bool minHeap = false) {
             if(capacity < 0)throw new ArgumentOutOfRangeException(nameof(capacity));
 
             _buffer = new T[capacity];
+            IsMinHeap = minHeap;
             Count = 0;
         }
 
@@ -43,6 +46,42 @@ namespace PathfindAllDay.Structs {
         public bool Contains(T item) {
             if(item == null) throw new ArgumentNullException();
             return item.Equals(_buffer[item.QueueIndex]);
+        }
+
+        /// <summary>
+        /// Checks whether any item in the queue satisfies a condition.
+        /// </summary>
+        /// <param name="pred">The condition to check.</param>
+        /// <returns>Whether at least one item satisfies <paramref name="pred"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="pred"/> is <see langword="null"/>.</exception>
+        public bool Any(Predicate<T> pred) {
+            if(pred == null) throw new ArgumentNullException();
+            foreach(T element in _buffer) if(pred(element)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether all item in the queue satisfies a condition.
+        /// </summary>
+        /// <param name="pred">The condition to check.</param>
+        /// <returns>Whether all item satisfies <paramref name="pred"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="pred"/> is <see langword="null"/>.</exception>
+        public bool All(Predicate<T> pred) {
+            if(pred == null) throw new ArgumentNullException();
+            foreach(T element in _buffer) if(!pred(element)) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Finds the first item in the queue that satisfies a condition.
+        /// </summary>
+        /// <param name="pred">The condition to check.</param>
+        /// <returns>The first item in the queue that satisfies <paramref name="pred"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="pred"/> is <see langword="null"/>.</exception>
+        public T Find(Predicate<T> pred) {
+            if(pred == null) throw new ArgumentNullException();
+            foreach(T element in _buffer) if(pred(element)) return element;
+            return default;
         }
 
         /// <summary>
@@ -90,7 +129,8 @@ namespace PathfindAllDay.Structs {
             
             while(parentIndex >= 0) {
                 T parentItem = _buffer[parentIndex];
-                if(item.CompareTo(parentItem) > 0) {
+                int compare = item.CompareTo(parentItem);
+                if(!IsMinHeap ? compare > 0 : compare < 0) {
                     Swap(item, parentItem);
                 } else {
                     return;
@@ -112,12 +152,14 @@ namespace PathfindAllDay.Structs {
                 if(childIndexLeft < Count) {
                     swapIndex = childIndexLeft;
                     if(childIndexRight < Count) {
-                        if(_buffer[childIndexLeft].CompareTo(_buffer[childIndexRight]) < 0) {
+                        int compareChild = _buffer[childIndexLeft].CompareTo(_buffer[childIndexRight]);
+                        if(!IsMinHeap ? compareChild < 0 : compareChild > 0) {
                             swapIndex = childIndexRight;
                         }
                     }
 
-                    if(item.CompareTo(_buffer[swapIndex]) < 0) {
+                    int compare = item.CompareTo(_buffer[swapIndex]);
+                    if(!IsMinHeap ? compare < 0 : compare > 0) {
                         Swap(item, _buffer[swapIndex]);
                     } else {
                         return;
