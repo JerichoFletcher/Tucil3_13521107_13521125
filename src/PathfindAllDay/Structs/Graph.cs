@@ -8,7 +8,9 @@ namespace PathfindAllDay.Structs {
     /// <typeparam name="TNode">Type of each node.</typeparam>
     /// <typeparam name="TEdgeData">Type of data stored in each edge.</typeparam>
     public class DirectedGraph<TNode, TEdgeData> {
+        /// <summary>Stores each node and its adjacent nodes.</summary>
         private readonly Dictionary<TNode, LinkedList<TNode>> _adjacencyLists;
+        /// <summary>Stores each edge and its stored data.</summary>
         private readonly Dictionary<(TNode, TNode), TEdgeData> _edges;
 
         /// <summary>The number of nodes stored in the graph.</summary>
