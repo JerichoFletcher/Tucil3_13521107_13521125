@@ -6,14 +6,14 @@ namespace PathfindAllDay.Algorithms {
     /// <summary>
     /// A class that contains a traversal algorithm over a graph instance, with modifiable g- and h-function.
     /// </summary>
-    /// <typeparam name="TNode">Type of the graph node.</typeparam>
-    public class GraphTraversalAlgorithm<TNode> {
+    /// <typeparam name="T">Type of the graph node.</typeparam>
+    public class GraphTraversalAlgorithm<T> {
         /// <summary>The internal reference to the graph.</summary>
-        readonly DirectedGraph<TNode, double> _graph;
+        readonly DirectedGraph<T, double> _graph;
         /// <summary>An internal queue of open nodes.</summary>
-        readonly PriorityQueue<GraphTraversalNode<TNode>> _open;
+        readonly PriorityQueue<GraphTraversalNode<T>> _open;
         /// <summary>An internal map of visited nodes.</summary>
-        readonly Dictionary<TNode, GraphTraversalNode<TNode>> _closed;
+        readonly Dictionary<T, GraphTraversalNode<T>> _closed;
 
         /// <summary>The g-function of the traversal algorithm.</summary>
         public Func<Info, double> GFunction { get; set; } = info => 0d;
@@ -25,10 +25,10 @@ namespace PathfindAllDay.Algorithms {
         /// </summary>
         /// <param name="graph">The graph to traverse.</param>
         /// <param name="minHeap">Whether to use min-heap to sort expand nodes.</param>
-        public GraphTraversalAlgorithm(DirectedGraph<TNode, double> graph, bool minHeap = false) {
+        public GraphTraversalAlgorithm(DirectedGraph<T, double> graph, bool minHeap = false) {
             _graph = graph;
-            _open = new PriorityQueue<GraphTraversalNode<TNode>>(_graph.NodeCount, minHeap);
-            _closed = new Dictionary<TNode, GraphTraversalNode<TNode>>();
+            _open = new PriorityQueue<GraphTraversalNode<T>>(_graph.NodeCount, minHeap);
+            _closed = new Dictionary<T, GraphTraversalNode<T>>();
         }
 
         /// <summary>
@@ -42,40 +42,61 @@ namespace PathfindAllDay.Algorithms {
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="start"/> or <paramref name="end"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">Thrown when either <paramref name="start"/> or <paramref name="end"/> is not contained in the graph.</exception>
-        public TNode[] FindPath(TNode start, TNode end) {
+        public T[] FindPath(T start, T end) {
             if(start == null || end == null) throw new ArgumentNullException();
             if(!_graph.ContainsNode(start) || !_graph.ContainsNode(end)) throw new ArgumentException("Node is not in the graph.");
 
+            Console.WriteLine($">>> Beginning search, from: {start}, to: {end}"); 
             _open.Clear(); _closed.Clear();
 
+            // Add the starting node to the open queue.
             bool success = false;
-            GraphTraversalNode<TNode> expandNode = new GraphTraversalNode<TNode>(start, null);
+            GraphTraversalNode<T> expandNode = new GraphTraversalNode<T>(start, null);
             _open.TryEnqueue(expandNode);
 
+            Console.WriteLine($"  Queue: {_open}");
+            // Dequeue a node from the open queue and add it to the closed set. Repeat until the open set is empty.
             while(_open.TryDequeue(out expandNode)) {
+                Console.WriteLine($"    Selected: {expandNode.Value}");
                 _closed.Add(expandNode.Value, expandNode);
 
+                // If the end node is reached, then a path is found: bail out early from the loop.
                 success = expandNode.Value.Equals(end);
                 if(success) break;
 
-                foreach(GraphEdge<TNode, double> expandEdge in _graph.OutEdges(expandNode.Value)) {
+                // If not, then enumerate through the node's open neighbors...
+                foreach(GraphEdge<T, double> expandEdge in _graph.OutEdges(expandNode.Value)) {
                     if(_closed.ContainsKey(expandEdge.To)) continue;
 
+                    // ...and calculate its g-cost.
                     double gCost = GFunction(new Info(start, end, expandNode, expandEdge));
-                    GraphTraversalNode<TNode> neighborNode = _open.Find(node => node.Value.Equals(expandEdge.To));
-                    if(neighborNode == null || neighborNode.GCost < gCost) {
-                        if(neighborNode == null) {
-                            neighborNode = new GraphTraversalNode<TNode>(expandEdge.To, expandNode);
-                            _open.TryEnqueue(neighborNode);
-                        }
+                    GraphTraversalNode<T> neighborNode = _open.Find(node => node.Value.Equals(expandEdge.To));
+                    Console.WriteLine($"      Evaluating node {expandEdge.To} -> {expandEdge.From}, got {gCost}{(neighborNode != null ? " versus " + neighborNode.GCost : "")}");
+
+                    // If the neighbor hasn't been visited yet or the calculated g-cost is smaller than the stored g-cost...
+                    if(neighborNode == null || gCost < neighborNode.GCost) {
+                        if(neighborNode == null)
+                            neighborNode = new GraphTraversalNode<T>(expandEdge.To, expandNode);
+
+                        // ...update the neighbor's g- and h-cost...
                         neighborNode.GCost = gCost;
                         neighborNode.HCost = HFunction(new Info(start, end, expandNode, expandEdge));
                         neighborNode.Parent = expandNode;
+
+                        // ...and update the neighbor's order in the open queue.
+                        if(!_open.Contains(neighborNode))
+                            _open.TryEnqueue(neighborNode);
+                        else
+                            _open.Update(neighborNode);
                     }
                 }
+                Console.WriteLine($"  Queue: {_open}");
             }
 
-            return success ? expandNode.Backtrack() : null;
+            T[] result = success ? expandNode.Backtrack() : null;
+
+            Console.WriteLine($"<<< Result: {(success ? $"success [{string.Join(", ", result)}]" : "fail")}");
+            return result;
         }
 
         /// <summary>
@@ -83,13 +104,13 @@ namespace PathfindAllDay.Algorithms {
         /// </summary>
         public readonly struct Info {
             /// <summary>The start node of the searched path.</summary>
-            public TNode Start { get; }
+            public T Start { get; }
             /// <summary>The end node of the searched path.</summary>
-            public TNode End { get; }
+            public T End { get; }
             /// <summary>The currently expanded node.</summary>
-            public GraphTraversalNode<TNode> ExpandNode { get; }
+            public GraphTraversalNode<T> ExpandNode { get; }
             /// <summary>The edge over which the current node is expanded.</summary>
-            public GraphEdge<TNode, double> ExpandEdge { get; }
+            public GraphEdge<T, double> ExpandEdge { get; }
 
             /// <summary>
             /// Constructs an <see cref="Info"/> instance that contains the given information.
@@ -98,7 +119,7 @@ namespace PathfindAllDay.Algorithms {
             /// <param name="end">The end node of the searched path.</param>
             /// <param name="expandNode">The currently expanded node.</param>
             /// <param name="expandEdge">The edge over which the current node is expanded.</param>
-            public Info(TNode start, TNode end, GraphTraversalNode<TNode> expandNode, GraphEdge<TNode, double> expandEdge) {
+            public Info(T start, T end, GraphTraversalNode<T> expandNode, GraphEdge<T, double> expandEdge) {
                 Start = start; End = end; ExpandNode = expandNode; ExpandEdge = expandEdge;
             }
         }
@@ -152,6 +173,10 @@ namespace PathfindAllDay.Algorithms {
 
             path.Reverse();
             return path.ToArray();
+        }
+
+        public override string ToString() {
+            return $"({Value}{(Parent != null ? " -> " + Parent : "")}: {FCost})";
         }
     }
 }

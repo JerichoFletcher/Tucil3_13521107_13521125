@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace PathfindAllDay.Structs {
     /// <summary>
@@ -46,6 +47,15 @@ namespace PathfindAllDay.Structs {
         public bool Contains(T item) {
             if(item == null) throw new ArgumentNullException();
             return _buffer.GetLowerBound(0) <= item.QueueIndex && item.QueueIndex < Count && item.Equals(_buffer[item.QueueIndex]);
+        }
+
+        /// <summary>
+        /// Updates <paramref name="item"/>'s order in the queue. This should be called on every modification to <paramref name="item"/>'s comparison attribute.
+        /// </summary>
+        /// <param name="item">The item to be updated.</param>
+        public void Update(T item) {
+            SortUp(item);
+            SortDown(item);
         }
 
         /// <summary>
@@ -174,6 +184,17 @@ namespace PathfindAllDay.Structs {
             _buffer[b.QueueIndex] = a;
 
             (a.QueueIndex, b.QueueIndex) = (b.QueueIndex, a.QueueIndex);
+        }
+
+        public override string ToString() {
+            StringBuilder str = new StringBuilder();
+            str.Append("[");
+            for(int i = 0; i < Count; i++) {
+                str.Append(_buffer[i].ToString());
+                if(i < Count - 1) str.Append(", ");
+            }
+            str.Append("]");
+            return str.ToString();
         }
     }
 
