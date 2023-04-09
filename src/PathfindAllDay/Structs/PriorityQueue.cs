@@ -45,7 +45,7 @@ namespace PathfindAllDay.Structs {
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="item"/> is <see langword="null"/>.</exception>
         public bool Contains(T item) {
             if(item == null) throw new ArgumentNullException();
-            return _buffer.GetLowerBound(0) <= item.QueueIndex && item.QueueIndex <= _buffer.GetUpperBound(0) && item.Equals(_buffer[item.QueueIndex]);
+            return _buffer.GetLowerBound(0) <= item.QueueIndex && item.QueueIndex < Count && item.Equals(_buffer[item.QueueIndex]);
         }
 
         /// <summary>
