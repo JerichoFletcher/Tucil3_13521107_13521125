@@ -123,8 +123,9 @@ namespace PathfindAllDay.Structs {
             if(from == null) throw new ArgumentNullException();
             if(!ContainsNode(from)) throw new ArgumentException($"Graph doesn't contain the node {from}");
 
-            foreach(TNode to in _adjacencyLists[from])
-                yield return new GraphEdge<TNode, TEdgeData>(from, to, _edges[(from, to)]);
+            if(_adjacencyLists[from] != null)
+                foreach(TNode to in _adjacencyLists[from])
+                    yield return new GraphEdge<TNode, TEdgeData>(from, to, _edges[(from, to)]);
         }
     }
 

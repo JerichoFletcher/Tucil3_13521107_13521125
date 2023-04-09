@@ -45,7 +45,7 @@ namespace PathfindAllDay.Structs {
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="item"/> is <see langword="null"/>.</exception>
         public bool Contains(T item) {
             if(item == null) throw new ArgumentNullException();
-            return item.Equals(_buffer[item.QueueIndex]);
+            return _buffer.GetLowerBound(0) <= item.QueueIndex && item.QueueIndex <= _buffer.GetUpperBound(0) && item.Equals(_buffer[item.QueueIndex]);
         }
 
         /// <summary>
@@ -132,9 +132,7 @@ namespace PathfindAllDay.Structs {
                 int compare = item.CompareTo(parentItem);
                 if(!IsMinHeap ? compare > 0 : compare < 0) {
                     Swap(item, parentItem);
-                } else {
-                    return;
-                }
+                } else return;
                 parentIndex = (item.QueueIndex - 1) / 2;
             }
         }
@@ -161,12 +159,8 @@ namespace PathfindAllDay.Structs {
                     int compare = item.CompareTo(_buffer[swapIndex]);
                     if(!IsMinHeap ? compare < 0 : compare > 0) {
                         Swap(item, _buffer[swapIndex]);
-                    } else {
-                        return;
-                    }
-                } else {
-                    return;
-                }
+                    } else return;
+                } else return;
             }
         }
 
@@ -179,9 +173,7 @@ namespace PathfindAllDay.Structs {
             _buffer[a.QueueIndex] = b;
             _buffer[b.QueueIndex] = a;
 
-            int temp = a.QueueIndex;
-            a.QueueIndex = b.QueueIndex;
-            b.QueueIndex = temp;
+            (a.QueueIndex, b.QueueIndex) = (b.QueueIndex, a.QueueIndex);
         }
     }
 
