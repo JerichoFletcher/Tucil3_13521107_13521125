@@ -58,10 +58,8 @@ namespace PathfindAllDayTest {
             Assert.AreEqual(0, graph.NodeCount);
             Assert.AreEqual(0, graph.EdgeCount);
 
-            int nodeCount = 5;
-
             // Graph node add success and fail test
-            for(int i = 1; i <= nodeCount; i++) {
+            for(int i = 1; i <= 5; i++) {
                 // Pre-add
                 Assert.IsFalse(graph.ContainsNode(i));
 
@@ -97,6 +95,21 @@ namespace PathfindAllDayTest {
                 Assert.ThrowsException<ArgumentException>(() => graph.AddEdge(a, b, weight));
             }
 
+            // Pre-add edge with nonexistent node
+            Assert.IsFalse(graph.ContainsNode(6));
+            Assert.IsFalse(graph.ContainsEdge(6, 2));
+            Assert.IsFalse(graph.TryGetEdge(6, 2, out int _));
+
+            // Add edge with nonexistent node
+            graph.AddEdge(6, 2, 1);
+
+            // Post-add edge with nonexistent node
+            Assert.IsTrue(graph.ContainsEdge(6, 2));
+            Assert.IsTrue(graph.TryGetEdge(6, 2, out int storedWeight2));
+            Assert.AreEqual(1, storedWeight2);
+            Assert.AreEqual(pairs.Length + 1, graph.EdgeCount);
+            Assert.ThrowsException<ArgumentException>(() => graph.AddEdge(6, 2, 1));
+
             // Graph node and neighbor enumeration test
             HashSet<int> uncheckedNeighbors = new HashSet<int>();
             int[][] neighbors = new int[][] {
@@ -104,11 +117,12 @@ namespace PathfindAllDayTest {
                 new int[] { 4 },
                 new int[] { 4, 5 },
                 new int[] { },
-                new int[] { }
+                new int[] { },
+                new int[] { 2 }
             };
             foreach(int node in graph.Nodes()) {
                 // Ignore irrelevant nodes
-                if(1 <= node && node <= nodeCount) {
+                if(1 <= node && node <= 6) {
                     // List all neighbors to be checked
                     foreach(int n in neighbors[node - 1]) uncheckedNeighbors.Add(n);
 
