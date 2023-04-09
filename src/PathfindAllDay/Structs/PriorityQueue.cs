@@ -56,7 +56,7 @@ namespace PathfindAllDay.Structs {
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="pred"/> is <see langword="null"/>.</exception>
         public bool Any(Predicate<T> pred) {
             if(pred == null) throw new ArgumentNullException();
-            foreach(T element in _buffer) if(pred(element)) return true;
+            for(int i = 0; i < Count; i++) if(pred(_buffer[i])) return true;
             return false;
         }
 
@@ -68,7 +68,7 @@ namespace PathfindAllDay.Structs {
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="pred"/> is <see langword="null"/>.</exception>
         public bool All(Predicate<T> pred) {
             if(pred == null) throw new ArgumentNullException();
-            foreach(T element in _buffer) if(!pred(element)) return false;
+            for(int i = 0; i < Count; i++) if(pred(_buffer[i])) return false;
             return true;
         }
 
@@ -80,7 +80,7 @@ namespace PathfindAllDay.Structs {
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="pred"/> is <see langword="null"/>.</exception>
         public T Find(Predicate<T> pred) {
             if(pred == null) throw new ArgumentNullException();
-            foreach(T element in _buffer) if(pred(element)) return element;
+            for(int i = 0; i < Count; i++) if(pred(_buffer[i])) return _buffer[i];
             return default;
         }
 
