@@ -102,6 +102,7 @@ namespace PathfindAllDayTest {
 
             // Add edge with nonexistent node
             graph.AddEdge(6, 2, 1);
+            uncheckedNodes.Add(6);
 
             // Post-add edge with nonexistent node
             Assert.IsTrue(graph.ContainsEdge(6, 2));
