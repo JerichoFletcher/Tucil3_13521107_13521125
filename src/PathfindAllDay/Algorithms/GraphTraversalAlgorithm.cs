@@ -24,9 +24,10 @@ namespace PathfindAllDay.Algorithms {
         /// Instantiates a traversal algorithm over the given graph.
         /// </summary>
         /// <param name="graph">The graph to traverse.</param>
-        public GraphTraversalAlgorithm(DirectedGraph<TNode, double> graph) {
+        /// <param name="minHeap">Whether to use min-heap to sort expand nodes.</param>
+        public GraphTraversalAlgorithm(DirectedGraph<TNode, double> graph, bool minHeap = false) {
             _graph = graph;
-            _open = new PriorityQueue<GraphTraversalNode<TNode>>(_graph.NodeCount);
+            _open = new PriorityQueue<GraphTraversalNode<TNode>>(_graph.NodeCount, minHeap);
             _closed = new Dictionary<TNode, GraphTraversalNode<TNode>>();
         }
 
