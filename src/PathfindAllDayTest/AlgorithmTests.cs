@@ -2,7 +2,6 @@
 using PathfindAllDay.Structs;
 using PathfindAllDay.Algorithms;
 using System.Linq;
-using System.Diagnostics;
 using System;
 
 namespace PathfindAllDayTest {
