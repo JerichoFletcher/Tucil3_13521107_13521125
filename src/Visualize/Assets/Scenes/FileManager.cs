@@ -21,6 +21,7 @@ public class FileManager : MonoBehaviour {
     private readonly List<GameObject> nodeObjects = new List<GameObject>();
     private readonly List<GameObject> edgeObjects = new List<GameObject>();
     private readonly Dictionary<string, MapNode> nodes = new Dictionary<string, MapNode>();
+    private readonly List<string> nodeNames = new List<string>();
     private readonly Dictionary<string, string> inputOptions = new Dictionary<string, string>();
 
     private const string
@@ -55,16 +56,24 @@ public class FileManager : MonoBehaviour {
             reader = new StreamReader(fileName);
             graph = new DirectedGraph<MapNode, double>();
             nodes.Clear();
+            nodeNames.Clear();
             inputOptions.Clear();
 
             // Handle file read here
+            bool isReadingMatrix = false;
+            int matrixRowsRead = 0;
             while(!reader.EndOfStream) {
                 string lineStr = reader.ReadLine().Trim();
-                if(string.IsNullOrEmpty(lineStr) || lineStr.StartsWith('#')) continue;
+                if(string.IsNullOrEmpty(lineStr) || lineStr.StartsWith('#')) {
+                    lineNum++;
+                    continue;
+                }
                 string[] columns = lineStr.Split(',');
 
                 switch(columns[0]) {
                     case "O":
+                        if(isReadingMatrix) throw new InvalidDataException($"{errMsgHead(lineNum)}: Interrupted matrix reading.");
+
                         // Read columns as options with the format key=value
                         for(int i = 1; i < columns.Length; i++) {
                             string[] option = columns[i].Split('=');
@@ -77,6 +86,7 @@ public class FileManager : MonoBehaviour {
 
                         break;
                     case "N":
+                        if(isReadingMatrix) throw new InvalidDataException($"{errMsgHead(lineNum)}: Interrupted matrix reading.");
                         if(!inputOptions.ContainsKey(optNodeFormat)) throw new InvalidDataException($"{errMsgHead(lineNum)}: Missing option '{optNodeFormat}' needed to parse node data.");
 
                         // Read node data in determined format
@@ -84,6 +94,7 @@ public class FileManager : MonoBehaviour {
                         string nodeFmt = inputOptions[optNodeFormat];
                         double lat = 0d, lon = 0d;
                         string nodeName = null;
+
                         switch(nodeFmt) {
                             case optNodeFormatXY:
                             case optNodeFormatLatLon:
@@ -104,20 +115,24 @@ public class FileManager : MonoBehaviour {
                         }
 
                         nodes.Add(nodeName, node);
+                        nodeNames.Add(nodeName);
                         graph.AddNode(node);
 
                         break;
                     case "E":
                         if(!inputOptions.ContainsKey(optEdgeFormat))throw new InvalidDataException($"{errMsgHead(lineNum)}: Missing option '{optEdgeFormat}' needed to parse edge data.");
 
-                        // Read edge data
+                        // Read edge data in determined format
                         string edgeFmt = inputOptions[optEdgeFormat];
 
+                        double cost = 0d;
                         switch(edgeFmt) {
                             case optEdgeFormatPair:
+                                if(isReadingMatrix) throw new InvalidDataException($"{errMsgHead(lineNum)}: Interrupted matrix reading.");
+
                                 string from = columns[1];
                                 string to = columns[2];
-                                double cost = double.Parse(columns[3]);
+                                cost = double.Parse(columns[3]);
                                 string kind = columns[4];
 
                                 switch(kind) {
@@ -134,7 +149,20 @@ public class FileManager : MonoBehaviour {
                                 }
                                 break;
                             case optEdgeFormatMatrix:
-                                // TODO: Add
+                                if(isReadingMatrix && matrixRowsRead >= nodes.Count) throw new InvalidDataException($"{errMsgHead(lineNum)}: Wrong number of matrix rows (expected {nodes.Count}).");
+
+                                if(!isReadingMatrix) isReadingMatrix = true;
+                                string[] matrixCols = columns[1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                if(matrixCols.Length == nodes.Count) {
+                                    for(int i = 0; i < matrixCols.Length; i++) {
+                                        cost = double.Parse(matrixCols[i]);
+                                        if(cost > 0d) graph.AddEdge(nodes[nodeNames[matrixRowsRead]], nodes[nodeNames[i]], cost);
+                                    }
+                                } else {
+                                    throw new InvalidDataException($"{errMsgHead(lineNum)}: Wrong number of matrix columns (expected {nodes.Count}).");
+                                }
+
+                                matrixRowsRead++;
                                 break;
                         }
 
@@ -155,16 +183,13 @@ public class FileManager : MonoBehaviour {
             // Handle file read error here
             Debug.LogError($"Failed to read file: {e}");
             graph = null;
-            nodes.Clear();
         } catch(InvalidDataException e) {
             // Handle invalid file format here
             Debug.LogException(e);
             graph = null;
-            nodes.Clear();
         } catch(Exception e) {
-            Debug.LogError($"{errMsgHead(lineNum)}: {e.Message}");
+            Debug.LogError($"{errMsgHead(lineNum)}: {e.Message}\n{e.StackTrace}");
             graph = null;
-            nodes.Clear();
         } finally {
             reader?.Close();
         }
@@ -180,6 +205,7 @@ public class FileManager : MonoBehaviour {
         string endNode = inputSimpulTujuan.text;
 
         // Handle show path here
+        bool greatCircle = inputOptions[optNodeFormat].Equals(optNodeFormatLatLon) || inputOptions[optNodeFormat].Equals(optNodeFormatLonLat);
         GraphTraversalAlgorithm<MapNode>
             ucs = new GraphTraversalAlgorithm<MapNode>(graph, true) {
                 GFunction = info => info.ExpandNode.GCost + info.ExpandEdge.Data,
@@ -187,15 +213,28 @@ public class FileManager : MonoBehaviour {
             },
             astar = new GraphTraversalAlgorithm<MapNode>(graph, true) {
                 GFunction = info => info.ExpandNode.GCost + info.ExpandEdge.Data,
-                HFunction = info => info.ExpandEdge.To.DistanceGreatCircle(info.End)
+                HFunction = greatCircle ? info => info.ExpandEdge.To.DistanceGreatCircle(info.End) : info => info.ExpandEdge.To.DistanceEuclidean(info.End)
             };
 
         MapNode[]
             ucsPath = ucs.FindPath(nodes[startNode], nodes[endNode]),
             astarPath = astar.FindPath(nodes[startNode], nodes[endNode]);
+        double ucsPathCost = 0d, astarPathCost = 0d;
+        if(ucsPath?.Length > 1) {
+            for(int i = 0; i < ucsPath.Length - 1; i++) {
+                graph.TryGetEdge(ucsPath[i], ucsPath[i + 1], out double cost);
+                ucsPathCost += cost;
+            }
+        }
+        if(astarPath?.Length > 1) {
+            for(int i = 0; i < astarPath.Length - 1; i++) {
+                graph.TryGetEdge(astarPath[i], astarPath[i + 1], out double cost);
+                astarPathCost += cost;
+            }
+        }
 
-        Debug.Log(ucsPath != null ? $"Found path with UCS: {string.Join<MapNode>(" -> ", ucsPath)}" : "Found no path with UCS.");
-        Debug.Log(astarPath != null ? $"Found path with A*: {string.Join<MapNode>(" -> ", astarPath)}" : "Found no path with A*.");
+        Debug.Log(ucsPath != null ? $"Found path with UCS, cost {ucsPathCost}: {string.Join<MapNode>(" -> ", ucsPath)}" : "Found no path with UCS.");
+        Debug.Log(astarPath != null ? $"Found path with A*, cost {astarPathCost}: {string.Join<MapNode>(" -> ", astarPath)}" : "Found no path with A*.");
     }
 }
 

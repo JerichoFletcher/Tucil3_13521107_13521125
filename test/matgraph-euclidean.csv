@@ -1,0 +1,19 @@
+# Node coordinate is in XY format
+O,format=xy,edge=matrix
+
+# Nodes
+N,1,1,A
+N,3,2,B
+N,2,4,C
+N,4,4,D
+N,7,3,E
+N,7,2,F
+
+# Edges
+# A  B  C  D  E  F
+E,0  0  6  6  0  0
+E,0  0  3  0  0  4
+E,0  3  0  0  0  11
+E,6  0  0  0  4  0
+E,0  0  6  0  0  1
+E,0  4  0  0  1  0
