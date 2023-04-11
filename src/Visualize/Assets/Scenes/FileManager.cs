@@ -29,34 +29,13 @@ public class FileManager : MonoBehaviour
     {
         StreamReader reader = new StreamReader(fileName);
 
-        numNodes = int.Parse(reader.ReadLine());
-
-        // tambahkan semua edge ke dalam graph
-        for (int i = 0; i < numNodes; i++) {
-            string[] line = reader.ReadLine().Split(' ');
-
-            for (int j = 0; j < numNodes; j++){
-                if (int.Parse(line[j]) == 1)
-                {
-
-                    // tambahkan GameObject untuk edge
-                    GameObject edgeObject = Instantiate(edgePrefab, Vector3.zero, Quaternion.identity);
-                    LineRenderer lineRenderer = edgeObject.GetComponent<LineRenderer>();
-                    lineRenderer.SetPosition(0, nodeObjects[i].transform.position);
-                    lineRenderer.SetPosition(1, nodeObjects[j].transform.position);
-
-                    edgeObjects.Add(edgeObject);
-                }
-            }
-        }
-
-        reader.Close();
+        
     }
 
 
     void onShowMap()
     {
-        string fileName = "test.txt";
+        string fileName = "../test.txt";
         ReadFile(fileName);
     }
 
@@ -67,12 +46,17 @@ public class FileManager : MonoBehaviour
 
         if (DropdownAlgorithm.value == 0)
         {
-            // UCS
+            
         }
         else if (DropdownAlgorithm.value == 1)
         {
-            // kode untuk menampilkan lintasan terpendek menggunakan A*
-            // ...
+           
         }
-    }
+    }   
+}
+
+class MapNode
+{
+    public string Name { get; private set; }
+
 }
