@@ -1,0 +1,46 @@
+#, Node coordinate is in lon-lat format
+N,107.6040898,-6.9208222,Asia Afrika A
+N,107.6050782,-6.9208964,Asia Afrika B
+N,107.6064737,-6.9210422,Asia Afrika C
+N,107.607657,-6.9213172,Asia Afrika D
+N,107.6087653,-6.921361,Asia Afrika E
+N,107.6099786,-6.9214898,Asia Afrika F
+N,107.6039371,-6.9231211,Otto Iskandar Dinata
+N,107.6063511,-6.9223968,Dalem Kaum A
+N,107.6076301,-6.9225448,Dalem Kaum B
+N,107.6097838,-6.9227463,Dalem Kaum C
+N,107.6062331,-6.9233767,Kepatihan
+N,107.6042693,-6.9183202,ABC A
+N,107.6054043,-6.9186524,ABC B
+N,107.6083516,-6.9195765,ABC C
+N,107.6089804,-6.9197364,ABC D
+N,107.6099594,-6.9197204,ABC E
+N,107.6066726,-6.9188953,Banceuy A
+N,107.6065797,-6.9200103,Banceuy B
+N,107.6081731,-6.9202192,Cikapundung Barat
+E,Asia Afrika F,Asia Afrika E,135,directed
+E,Asia Afrika E,Asia Afrika D,134,directed
+E,Asia Afrika D,Asia Afrika C,134,directed
+E,Asia Afrika C,Asia Afrika B,155,directed 
+E,Asia Afrika B,Asia Afrika A,110,directed
+E,ABC A,Asia Afrika A,279,directed
+E,ABC A, ABC B,131,directed
+E,Asia Afrika B,ABC B,253,directed
+E,ABC B,Banceuy A,164,directed
+E,Asia Afrika C,Banceuy B,115,directed
+E,Banceuy B,Banceuy A,131,directed
+E,Banceuy A,ABC C,207,directed
+E,Banceuy B,Cikapundung Barat,178,undirected
+E,Cikapundung Barat,ABC C,74,directed
+E,Asia Afrika D,Cikapundung Barat,162,directed
+E,ABC C,ABC D,72,directed
+E,ABC D,ABC E,108,directed
+E,Asia Afrika E,ABC D,182,directed
+E,ABC E,Asia Afrika E,311,directed
+E,Asia Afrika F,Dalem Kaum C,142,directed
+E,Dalem Kaum B,Dalem Kaum C,248,directed
+E,Asia Afrika D,Dalem Kaum B,137,undirected
+E,Dalem Kaum A,Dalem Kaum B,144,directed
+E,Kepatihan,Dalem Kaum A,111,directed
+E,Otto Iskandar Dinata,Kepatihan,255,undirected
+E,Asia Afrika A,Otto Iskandar Dinata,256,directed

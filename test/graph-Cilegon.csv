@@ -1,0 +1,26 @@
+#, Node coordinate is in lon-lat format
+N,106.0434727,-6.011673,Raya Pantura A
+N,106.0490901,-6.015428,Raya Pantura B
+N,106.055773,-6.0186019,Raya Pantura C
+N,106.0816198,-6.0335235,Raya Pantura D
+N,106.0350139,-6.0424858,Lingkar Selatan A
+N,106.0520084,-6.0493994,Lingkar Selatan B
+N,106.0576071,-6.0319271,KH. M. Sadeli
+N,106.0659102,-6.0319271,Bunderan Perumnas
+N,106.0709099,-5.997197,Bojonegara
+N,106.0492974,-5.9896366,Kali Gandu
+E,Raya Pantura A,Raya Pantura B,749,undirected
+E,Raya Pantura B,Raya Pantura C,821,undirected
+E,Raya Pantura C,Raya Pantura D,3320,undirected
+E,Raya Pantura D,Bunderan Perumnas,2450,undirected
+E,Bunderan Perumnas,KH. M. Sadeli,1020,undirected
+E,KH. M. Sadeli,Lingkar Selatan B,2460,undirected
+E,Raya Pantura D,Lingkar Selatan B,4320,undirected
+E,Lingkar Selatan B,Lingkar Selatan A,2080,undirected
+E,Lingkar Selatan A,Raya Pantura B,3590,undirected
+E,KH. M. Sadeli,Raya Pantura C,1630,undirected
+E,Raya Pantura C,Bojonegara,3050,undirected
+E,Bojonegara,Kali Gandu,2610,undirected
+E,Kali Gandu,Raya Pantura A,2630,undirected
+
+
