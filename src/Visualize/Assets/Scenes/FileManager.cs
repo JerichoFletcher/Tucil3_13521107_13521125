@@ -14,6 +14,7 @@ public class FileManager : MonoBehaviour {
     public TMP_InputField inputSimpulAwal;
     public TMP_InputField inputSimpulTujuan;
     public TMP_InputField inputFileGraph;
+    public TMP_Text outputJarakHasil;
     public GameObject nodePrefab;
     public GameObject edgePrefab;
 
@@ -174,21 +175,38 @@ public class FileManager : MonoBehaviour {
                 lineNum++;
             }
 
+            outputJarakHasil.text = "Berhasil membuka file!";
+            outputJarakHasil.color = Color.green;
+
+#if UNITY_EDITOR
             StringBuilder str = new StringBuilder(" | ");
             foreach(KeyValuePair<string, MapNode> pair in nodes) {
                 str.Append(pair.Key + " | ");
             }
             Debug.Log($"Successfully read {graph.NodeCount} nodes and {graph.EdgeCount} edges:\n{str}");
+#endif
         } catch(IOException e) {
             // Handle file read error here
+#if UNITY_EDITOR
             Debug.LogError($"Failed to read file: {e}");
+#endif
+            outputJarakHasil.text = "Gagal membaca file!";
+            outputJarakHasil.color = Color.red;
             graph = null;
         } catch(InvalidDataException e) {
             // Handle invalid file format here
+#if UNITY_EDITOR
             Debug.LogException(e);
+#endif
+            outputJarakHasil.text = "File tidak valid!";
+            outputJarakHasil.color = Color.red;
             graph = null;
         } catch(Exception e) {
+#if UNITY_EDITOR
             Debug.LogError($"{errMsgHead(lineNum)}: {e.Message}\n{e.StackTrace}");
+#endif
+            outputJarakHasil.text = "Terjadi kesalahan!";
+            outputJarakHasil.color = Color.red;
             graph = null;
         } finally {
             reader?.Close();
@@ -232,6 +250,9 @@ public class FileManager : MonoBehaviour {
                 astarPathCost += cost;
             }
         }
+
+        outputJarakHasil.text = $"UCS: {ucsPathCost}\nA*: {astarPathCost}";
+        outputJarakHasil.color = Color.black;
 
         Debug.Log(ucsPath != null ? $"Found path with UCS, cost {ucsPathCost}: {string.Join<MapNode>(" -> ", ucsPath)}" : "Found no path with UCS.");
         Debug.Log(astarPath != null ? $"Found path with A*, cost {astarPathCost}: {string.Join<MapNode>(" -> ", astarPath)}" : "Found no path with A*.");

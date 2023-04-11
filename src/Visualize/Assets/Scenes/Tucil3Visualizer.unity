@@ -1894,10 +1894,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowMap: {fileID: 1386181347}
   ShowPath: {fileID: 596413031}
-  DropdownAlgorithm: {fileID: 0}
   inputSimpulAwal: {fileID: 140466495}
   inputSimpulTujuan: {fileID: 1215975495}
   inputFileGraph: {fileID: 286729635}
+  outputJarakHasil: {fileID: 679548287}
   nodePrefab: {fileID: 0}
   edgePrefab: {fileID: 0}
 --- !u!1 &648713416
@@ -2146,7 +2146,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -210.00003, y: -480}
+  m_AnchoredPosition: {x: -290, y: -480}
   m_SizeDelta: {x: 500, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &679548287

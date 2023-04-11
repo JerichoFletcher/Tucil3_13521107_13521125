@@ -1,5 +1,5 @@
 # Node coordinate is in lon-lat format
-O,format=lonlat,edge=matrix
+O,format=lonlat,edge=pair
 N,107.6040898,-6.9208222,Asia Afrika A
 N,107.6050782,-6.9208964,Asia Afrika B
 N,107.6064737,-6.9210422,Asia Afrika C
@@ -19,49 +19,29 @@ N,107.6099594,-6.9197204,ABC E
 N,107.6066726,-6.9188953,Banceuy A
 N,107.6065797,-6.9200103,Banceuy B
 N,107.6081731,-6.9202192,Cikapundung Barat
-E,0    0    0    0    0    0    256  0    0    0    0    0    0    0    0    0    0    0    0
-E,110  0    0    0    0    0    0    0    0    0    0    0    253  0    0    0    0    0    0
-E,0    155  0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    115  0
-E,0    0    134  0    0    0    0    0    137  0    0    0    0    0    0    0    0    0    162
-E,0    0    0    134  0    0    0    0    0    0    0    0    182  0    0    0    0    0    0
-E,0    0    0    0    135  0    0    0    0    142  0    0    0    0    0    0    0    0    0
-E,0    0    0    0    0    0    0    0    0    0    255  0    0    0    0    0    0    0    0
-E,0    0    0    0    0    0    0    0    144  0    0    0    0    0    0    0    0    0    0
-E,0    0    0    137  0    0    0    0    0    248  0    0    0    0    0    0    0    0    0
-E,0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
-E,0    0    0    0    0    0    255  111  0    0    0    0    0    0    0    0    0    0    0
-E,279  0    0    0    0    0    0    0    0    0    0    0    131  0    0    0    0    0    0
-E,0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    164  0    0
-E,0    0    0    0    0    0    0    0    0    0    0    0    0    0    72   0    0    0    0
-E,0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    108  0    0    0
-E,0    0    0    0    311  0    0    0    0    0    0    0    0    0    0    0    0    0    0
-E,0    0    0    0    0    0    0    0    0    0    0    0    0    207  0    0    0    0    0
-E,0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    131  0    178
-E,0    0    0    0    0    0    0    0    0    0    0    0    0    74   0    0    0    178  0
-#E,Asia Afrika F,Asia Afrika E,135,directed
-#E,Asia Afrika E,Asia Afrika D,134,directed
-#E,Asia Afrika D,Asia Afrika C,134,directed
-#E,Asia Afrika C,Asia Afrika B,155,directed 
-#E,Asia Afrika B,Asia Afrika A,110,directed
-#E,ABC A,Asia Afrika A,279,directed
-#E,ABC A, ABC B,131,directed
-#E,Asia Afrika B,ABC B,253,directed
-#E,ABC B,Banceuy A,164,directed
-#E,Asia Afrika C,Banceuy B,115,directed
-#E,Banceuy B,Banceuy A,131,directed
-#E,Banceuy A,ABC C,207,directed
-#E,Banceuy B,Cikapundung Barat,178,undirected
-#E,Cikapundung Barat,ABC C,74,directed
-#E,Asia Afrika D,Cikapundung Barat,162,directed
-#E,ABC C,ABC D,72,directed
-#E,ABC D,ABC E,108,directed
-#E,Asia Afrika E,ABC D,182,directed
-#E,ABC E,Asia Afrika E,311,directed
-#E,Asia Afrika F,Dalem Kaum C,142,directed
-#E,Dalem Kaum B,Dalem Kaum C,248,directed
-#E,Asia Afrika D,Dalem Kaum B,137,undirected
-#E,Dalem Kaum A,Dalem Kaum B,144,directed
-#E,Kepatihan,Dalem Kaum A,111,directed
-#E,Otto Iskandar Dinata,Kepatihan,255,undirected
-#E,Asia Afrika A,Otto Iskandar Dinata,256,directed
-
+E,Asia Afrika F,Asia Afrika E,135,directed
+E,Asia Afrika E,Asia Afrika D,134,directed
+E,Asia Afrika D,Asia Afrika C,134,directed
+E,Asia Afrika C,Asia Afrika B,155,directed 
+E,Asia Afrika B,Asia Afrika A,110,directed
+E,ABC A,Asia Afrika A,279,directed
+E,ABC A, ABC B,131,directed
+E,Asia Afrika B,ABC B,253,directed
+E,ABC B,Banceuy A,164,directed
+E,Asia Afrika C,Banceuy B,115,directed
+E,Banceuy B,Banceuy A,131,directed
+E,Banceuy A,ABC C,207,directed
+E,Banceuy B,Cikapundung Barat,178,undirected
+E,Cikapundung Barat,ABC C,74,directed
+E,Asia Afrika D,Cikapundung Barat,162,directed
+E,ABC C,ABC D,72,directed
+E,ABC D,ABC E,108,directed
+E,Asia Afrika E,ABC D,182,directed
+E,ABC E,Asia Afrika E,311,directed
+E,Asia Afrika F,Dalem Kaum C,142,directed
+E,Dalem Kaum B,Dalem Kaum C,248,directed
+E,Asia Afrika D,Dalem Kaum B,137,undirected
+E,Dalem Kaum A,Dalem Kaum B,144,directed
+E,Kepatihan,Dalem Kaum A,111,directed
+E,Otto Iskandar Dinata,Kepatihan,255,undirected
+E,Asia Afrika A,Otto Iskandar Dinata,256,directed
