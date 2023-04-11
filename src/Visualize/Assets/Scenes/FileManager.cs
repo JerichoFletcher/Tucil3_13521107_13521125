@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using PathfindAllDay.Structs;
 using PathfindAllDay.Algorithms;
+using System.Text;
 
 public class FileManager : MonoBehaviour {
     public Button ShowMap;
@@ -16,10 +17,26 @@ public class FileManager : MonoBehaviour {
     public GameObject nodePrefab;
     public GameObject edgePrefab;
 
-    private List<GameObject> nodeObjects = new List<GameObject>();
-    private List<GameObject> edgeObjects = new List<GameObject>();
     private DirectedGraph<MapNode, double> graph = null;
-    private Dictionary<string, MapNode> nodes = new Dictionary<string, MapNode>();
+    private readonly List<GameObject> nodeObjects = new List<GameObject>();
+    private readonly List<GameObject> edgeObjects = new List<GameObject>();
+    private readonly Dictionary<string, MapNode> nodes = new Dictionary<string, MapNode>();
+    private readonly Dictionary<string, string> inputOptions = new Dictionary<string, string>();
+
+    private const string
+        optNodeFormat = "format",
+        optEdgeFormat = "edge";
+    private const string
+        optNodeFormatXY = "xy",
+        optNodeFormatYX = "yx",
+        optNodeFormatLatLon = "latlon",
+        optNodeFormatLonLat = "lonlat";
+    private const string
+        optEdgeFormatPair = "pair",
+        optEdgeFormatMatrix = "matrix";
+    private const string
+        argEdgeDirected = "directed",
+        argEdgeUndirected = "undirected";
 
     private void Update() {
         ShowMap.interactable = inputFileGraph.text?.Length > 0;
@@ -30,82 +47,128 @@ public class FileManager : MonoBehaviour {
 
     void ReadFile(string fileName) {
         StreamReader reader = null;
+        int lineNum = 1;
+
+        static string errMsgHead(int i) => $"Invalid file format, error at line {i}";
+
         try {
-            int lineNum = 1;
-            try {
-                reader = new StreamReader(fileName);
-                graph = new DirectedGraph<MapNode, double>();
-                nodes.Clear();
+            reader = new StreamReader(fileName);
+            graph = new DirectedGraph<MapNode, double>();
+            nodes.Clear();
+            inputOptions.Clear();
 
-                // Handle file read here
-                while(!reader.EndOfStream) {
-                    string lineStr = reader.ReadLine();
-                    string[] columns = lineStr.Split(',');
+            // Handle file read here
+            while(!reader.EndOfStream) {
+                string lineStr = reader.ReadLine().Trim();
+                if(string.IsNullOrEmpty(lineStr) || lineStr.StartsWith('#')) continue;
+                string[] columns = lineStr.Split(',');
 
-                    //bool matrixInput = false;
-                    switch(columns[0]) {
-                        case "N":
-                            // Read node data in lon-lat format
-                            double lat = double.Parse(columns[2]);
-                            double lon = double.Parse(columns[1]);
-                            string name = columns[3];
-
-                            MapNode node = new MapNode(name, lat, lon);
-                            nodes.Add(name, node);
-                            graph.AddNode(node);
-
-                            break;
-                        case "E":
-                            // Read edge data
-                            string from = columns[1];
-                            string to = columns[2];
-                            double cost = double.Parse(columns[3]);
-                            string kind = columns[4];
-
-                            switch(kind) {
-                                case "directed":
-                                    graph.AddEdge(nodes[from], nodes[to], cost);
-                                    break;
-                                case "undirected":
-                                    graph.AddEdge(nodes[from], nodes[to], cost);
-                                    graph.AddEdge(nodes[to], nodes[from], cost);
-                                    break;
-                                default:
-                                    // Invalid line
-                                    throw new InvalidDataException($"Invalid file format, error at line {lineNum}: Invalid edge type '{kind}'.");
+                switch(columns[0]) {
+                    case "O":
+                        // Read columns as options with the format key=value
+                        for(int i = 1; i < columns.Length; i++) {
+                            string[] option = columns[i].Split('=');
+                            if(option.Length == 2 && !string.IsNullOrEmpty(option[0]) && !string.IsNullOrEmpty(option[1])) {
+                                inputOptions.Add(option[0], option[1]);
+                            } else {
+                                throw new InvalidDataException($"{errMsgHead(lineNum)}: Invalid option syntax '{columns[i]}'.");
                             }
+                        }
 
-                            break;
-                        case "M":
-                            // Read matrix row
-                            // TODO: Add
-                            break;
-                        case "#":
-                            // Comment line
-                            break;
-                        default:
-                            // Invalid line
-                            throw new InvalidDataException($"Invalid file format, error at line {lineNum}: Invalid line ID '{columns[0]}'.");
-                    }
-                    lineNum++;
+                        break;
+                    case "N":
+                        if(!inputOptions.ContainsKey(optNodeFormat)) throw new InvalidDataException($"{errMsgHead(lineNum)}: Missing option '{optNodeFormat}' needed to parse node data.");
+
+                        // Read node data in determined format
+                        MapNode node = null;
+                        string nodeFmt = inputOptions[optNodeFormat];
+                        double lat = 0d, lon = 0d;
+                        string nodeName = null;
+                        switch(nodeFmt) {
+                            case optNodeFormatXY:
+                            case optNodeFormatLatLon:
+                                lat = double.Parse(columns[1]);
+                                lon = double.Parse(columns[2]);
+                                nodeName = columns[3];
+                                node = new MapNode(nodeName, lat, lon);
+                                break;
+                            case optNodeFormatYX:
+                            case optNodeFormatLonLat:
+                                lat = double.Parse(columns[2]);
+                                lon = double.Parse(columns[1]);
+                                nodeName = columns[3];
+                                node = new MapNode(nodeName, lat, lon);
+                                break;
+                            default:
+                                throw new InvalidDataException($"{errMsgHead(lineNum)}: Invalid option '{optNodeFormat}={nodeFmt}' while trying to parse node data.");
+                        }
+
+                        nodes.Add(nodeName, node);
+                        graph.AddNode(node);
+
+                        break;
+                    case "E":
+                        if(!inputOptions.ContainsKey(optEdgeFormat))throw new InvalidDataException($"{errMsgHead(lineNum)}: Missing option '{optEdgeFormat}' needed to parse edge data.");
+
+                        // Read edge data
+                        string edgeFmt = inputOptions[optEdgeFormat];
+
+                        switch(edgeFmt) {
+                            case optEdgeFormatPair:
+                                string from = columns[1];
+                                string to = columns[2];
+                                double cost = double.Parse(columns[3]);
+                                string kind = columns[4];
+
+                                switch(kind) {
+                                    case argEdgeDirected:
+                                        graph.AddEdge(nodes[from], nodes[to], cost);
+                                        break;
+                                    case argEdgeUndirected:
+                                        graph.AddEdge(nodes[from], nodes[to], cost);
+                                        graph.AddEdge(nodes[to], nodes[from], cost);
+                                        break;
+                                    default:
+                                        // Invalid type
+                                        throw new InvalidDataException($"{errMsgHead(lineNum)}: Invalid edge type '{kind}'.");
+                                }
+                                break;
+                            case optEdgeFormatMatrix:
+                                // TODO: Add
+                                break;
+                        }
+
+                        break;
+                    default:
+                        // Invalid line
+                        throw new InvalidDataException($"{errMsgHead(lineNum)}: Invalid line ID '{columns[0]}'.");
                 }
-                Debug.Log($"Successfully read {graph.NodeCount} nodes and {graph.EdgeCount} edges.");
-            } catch(FileNotFoundException e) {
-                // Handle file not found here
-                Debug.LogException(e);
-            } catch(Exception e) {
-                throw e is InvalidDataException ? e : new InvalidDataException($"Invalid file format, error at line {lineNum}: {e.Message}");
+                lineNum++;
             }
-        } catch(InvalidDataException e) {
-            // Handle invalid file format here
+
+            StringBuilder str = new StringBuilder(" | ");
+            foreach(KeyValuePair<string, MapNode> pair in nodes) {
+                str.Append(pair.Key + " | ");
+            }
+            Debug.Log($"Successfully read {graph.NodeCount} nodes and {graph.EdgeCount} edges:\n{str}");
+        } catch(IOException e) {
+            // Handle file read error here
+            Debug.LogError($"Failed to read file: {e}");
             graph = null;
             nodes.Clear();
+        } catch(InvalidDataException e) {
+            // Handle invalid file format here
             Debug.LogException(e);
+            graph = null;
+            nodes.Clear();
+        } catch(Exception e) {
+            Debug.LogError($"{errMsgHead(lineNum)}: {e.Message}");
+            graph = null;
+            nodes.Clear();
         } finally {
             reader?.Close();
         }
     }
-
 
     public void OnShowMap() {
         string fileName = inputFileGraph.text;
@@ -124,7 +187,7 @@ public class FileManager : MonoBehaviour {
             },
             astar = new GraphTraversalAlgorithm<MapNode>(graph, true) {
                 GFunction = info => info.ExpandNode.GCost + info.ExpandEdge.Data,
-                HFunction = info => info.ExpandEdge.To.DistanceTo(info.End)
+                HFunction = info => info.ExpandEdge.To.DistanceGreatCircle(info.End)
             };
 
         MapNode[]
@@ -146,7 +209,13 @@ class MapNode {
         Coordinate = (latitude, longitude);
     }
 
-    public double DistanceTo(MapNode other) {
+    public double DistanceEuclidean(MapNode other) {
+        double dx = other.Coordinate.x - Coordinate.x;
+        double dy = other.Coordinate.y - Coordinate.y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    public double DistanceGreatCircle(MapNode other) {
         const double Deg2Rad = Math.PI / 180d;
         double dLat = (other.Coordinate.x - Coordinate.x) * Deg2Rad;
         double dLon = (other.Coordinate.y - Coordinate.y) * Deg2Rad;
@@ -164,6 +233,6 @@ class MapNode {
     }
 
     public override string ToString() {
-        return $"{Coordinate}: {Name}";
+        return Name;
     }
 }

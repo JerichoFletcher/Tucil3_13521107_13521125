@@ -1,4 +1,5 @@
-#, Node coordinate is in lon-lat format
+# Node coordinate is in lon-lat format
+O,format=lonlat,edge=pair
 N,106.0434727,-6.011673,Raya Pantura A
 N,106.0490901,-6.015428,Raya Pantura B
 N,106.055773,-6.0186019,Raya Pantura C
@@ -22,5 +23,3 @@ E,KH. M. Sadeli,Raya Pantura C,1630,undirected
 E,Raya Pantura C,Bojonegara,3050,undirected
 E,Bojonegara,Kali Gandu,2610,undirected
 E,Kali Gandu,Raya Pantura A,2630,undirected
-
-

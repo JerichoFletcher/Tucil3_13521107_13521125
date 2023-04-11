@@ -1,4 +1,5 @@
-#, Node coordinate is in lon-lat format
+# Node coordinate is in lon-lat format
+O,format=lonlat,edge=pair
 N,107.608783,-6.8948617,Tamansari A
 N,107.60842,-6.8937402,Tamansari B
 N,107.6082665,-6.8878702,Tamansari C

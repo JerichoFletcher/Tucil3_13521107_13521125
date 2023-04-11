@@ -1,4 +1,5 @@
-#, Node coordinate is in lon-lat format
+# Node coordinate is in lon-lat format
+O,format=lonlat,edge=pair
 N,107.6040898,-6.9208222,Asia Afrika A
 N,107.6050782,-6.9208964,Asia Afrika B
 N,107.6064737,-6.9210422,Asia Afrika C
@@ -24,7 +25,7 @@ E,Asia Afrika D,Asia Afrika C,134,directed
 E,Asia Afrika C,Asia Afrika B,155,directed 
 E,Asia Afrika B,Asia Afrika A,110,directed
 E,ABC A,Asia Afrika A,279,directed
-E,ABC A, ABC B,131,directed
+E,ABC A,ABC B,131,directed
 E,Asia Afrika B,ABC B,253,directed
 E,ABC B,Banceuy A,164,directed
 E,Asia Afrika C,Banceuy B,115,directed

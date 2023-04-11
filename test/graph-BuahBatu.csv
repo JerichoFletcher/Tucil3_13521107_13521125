@@ -1,4 +1,5 @@
-#, Node coordinate is in lon-lat format
+# Node coordinate is in lon-lat format
+O,format=lonlat,edge=pair
 N,107.6401981,-6.9541001,Margacinta A
 N,107.6475469,-6.9550278,Margacinta B
 N,107.6499318,-6.9552515,Margacinta C
@@ -9,14 +10,13 @@ N,107.6489786,-6.9443565,Cijawura Girang
 N,107.6418074,-6.9459209,Ibrahim Adjie
 N,107.6526999,-6.942156,Soekarno Hatta
 N,107.6518114,-6.9596141,Pandanwangi
-E,Margacinta E,Margacinnta D,258,undirected
-E,Margacinta D,Margacinnta C,266,undirected
-E,Margacinta C,Margacinnta B,265,undirected
-E,Margacinta B,Margacinnta A,821,undirected
+E,Margacinta E,Margacinta D,258,undirected
+E,Margacinta D,Margacinta C,266,undirected
+E,Margacinta C,Margacinta B,265,undirected
+E,Margacinta B,Margacinta A,821,undirected
 E,Margacinta D,Pandanwangi,462,undirected
 E,Margacinta A,Ibrahim Adjie,930,undirected
 E,Soekarno Hatta,Ibrahim Adjie,1290,directed
 E,Margacinta C,Margaluyu Barat,332,undirected
 E,Margaluyu Barat,Soekarno Hatta,1220,undirected
 E,Margacinta B,Cijawura Girang,1220,undirected
-

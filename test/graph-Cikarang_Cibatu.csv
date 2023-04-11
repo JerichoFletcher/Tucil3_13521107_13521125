@@ -1,4 +1,5 @@
-#, Node coordinate is in lon-lat format
+# Node coordinate is in lon-lat format
+O,format=lonlat,edge=pair
 N,107.159511,-6.3368296,MH. Thamrin A
 N,107.1621073,-6.3370003,MH. Thamrin B
 N,107.1536858,-6.3346411,Bundaran MH. Thamrin-Sriwijaya
