@@ -1,69 +1,70 @@
-using System.Collections;
+using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
+using TMPro;
 using PathfindAllDay.Structs;
 
-public class FileManager : MonoBehaviour
-{
+public class FileManager : MonoBehaviour {
     public Button ShowMap;
     public Button ShowPath;
-    public Dropdown DropdownAlgorithm;
-    public InputField inputSimpulAwal;
-    public InputField inputSimpulTujuan;
-    public InputField inputFileGraph;
+    public TMP_InputField inputSimpulAwal;
+    public TMP_InputField inputSimpulTujuan;
+    public TMP_InputField inputFileGraph;
     public GameObject nodePrefab;
     public GameObject edgePrefab;
 
-    private int numNodes;
     private List<GameObject> nodeObjects = new List<GameObject>();
     private List<GameObject> edgeObjects = new List<GameObject>();
-    private DirectedGraph<MapNode, double> graph= new DirectedGraph<MapNode, double>();
- 
-    void Start()
-    {
-        ShowMap.onClick.AddListener(onShowMap);
-        ShowPath.onClick.AddListener(onShowPath);
+    private DirectedGraph<MapNode, double> graph = null;
+    private Dictionary<string, MapNode> nodes = new Dictionary<string, MapNode>();
+
+    private void Update() {
+        ShowMap.interactable = inputFileGraph.text?.Length > 0;
+        ShowPath.interactable = graph != null && inputSimpulAwal.text?.Length > 0 && inputSimpulTujuan.text?.Length > 0;
     }
 
-    void ReadFile(string fileName)
-    {
-        StreamReader reader = new StreamReader(fileName);
+    void ReadFile(string fileName) {
+        StreamReader reader = null;
+        try {
+            reader = new StreamReader(fileName);
+            // Handle file read here
+        } catch(Exception e) {
+            // Handle error here
+            Debug.LogException(e);
+        } finally {
+            reader?.Close();
+        }
     }
 
 
-    void onShowMap()
-    {
-        string fileName = inputFileGraph;
+    public void OnShowMap() {
+        string fileName = inputFileGraph.text;
         ReadFile(fileName);
     }
 
-    void onShowPath()
-    {
-        int startNode = int.Parse(inputSimpulAwal.text);
-        int endNode = int.Parse(inputSimpulTujuan.text);
+    public void OnShowPath() {
+        string startNode = inputSimpulAwal.text;
+        string endNode = inputSimpulTujuan.text;
 
-        
-
-        if (DropdownAlgorithm.value == 0)
-        {
-            
-        }
-        else if (DropdownAlgorithm.value == 1)
-        {
-           
-        }
-    }   
+        // Handle show path here
+    }
 }
 
-class MapNode
-{
+class MapNode {
     public string Name { get; private set; }
-    public Vector2 Koordinat { get; private set; }
-    public MapNode(string name)
-    {
+    public (double x, double y) Coordinate { get; private set; }
+    public MapNode(string name, double latitude, double longitude) {
         Name = name;
+        Coordinate = (latitude, longitude);
     }
 
+    public override bool Equals(object obj) {
+        return obj is MapNode node && Name.Equals(node.Name);
+    }
+
+    public override int GetHashCode() {
+        return Name.GetHashCode();
+    }
 }
