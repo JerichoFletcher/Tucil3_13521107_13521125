@@ -1,0 +1,35 @@
+N,107.608783,-6.8948617,Tamansari A
+N,107.60842,-6.8937402,Tamansari B
+N,107.6082665,-6.8878702,Tamansari C
+N,107.6114806,-6.8872532,Tamansari D
+N,107.6116764,-6.886465,Tamansari E
+N,107.6114718,-6.8849629,Tamansari F
+N,107.6093053,-6.8934058,Ganesa A
+N,107.6104436,-6.8931905,Ganesa B
+N,107.6119596,-6.8935537,Ganesa C
+N,107.6129286,-6.8937204,Dago A
+N,107.6135294,-6.8873914,Dago B
+N,107.6136478,-6.8852158,Dago C
+N,107.6101608,-6.8947687,Gelap Nyawang A
+N,107.6117003,-6.8947261,Gelap Nyawang B
+N,107.6099758,-6.8939384,Skanda A
+E,Tamansari A,Tamansari B,131,undirected
+E,Tamansari B,Tamansari C,654,undirected
+E,Tamansari C,Tamansari D,362,undirected
+E,Tamansari D,Tamansari E,90,undirected
+E,Tamansari E,Tamansari F,169,directed
+E,Dago A,Dago B,693,undirected
+E,Dago B,Dago C,243,undirected
+E,Tamansari A,Gelap Nyawang A,153,undirected
+E,Gelap Nyawang A,Gelap Nyawang B,170,undirected
+E,Gelap Nyawang B,Ganesa C,134,undirected
+E,Tamansari B,Ganesa A,105,undirected
+E,Ganesa A,Ganesa B,128,undirected
+E,Ganesa B,Ganesa C,172,undirected
+E,Ganesa C,Dago A,109,undirected
+E,Ganesa A,Skanda A,137,undirected
+E,Skanda A,Ganesa B,115,undirected
+E,Skanda A,Gelap Nyawang A,95,undirected
+E,Tamansari F,Dago C,242,directed
+E,Dago C,Tamansari E,281,directed
+E,Tamansari E,Dago B,227,undirected
