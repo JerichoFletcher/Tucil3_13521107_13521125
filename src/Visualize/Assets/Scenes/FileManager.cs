@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using PathfindAllDay.Structs;
+using PathfindAllDay.Algorithms;
 
 public class FileManager : MonoBehaviour {
     public Button ShowMap;
@@ -22,7 +23,9 @@ public class FileManager : MonoBehaviour {
 
     private void Update() {
         ShowMap.interactable = inputFileGraph.text?.Length > 0;
-        ShowPath.interactable = graph != null && inputSimpulAwal.text?.Length > 0 && inputSimpulTujuan.text?.Length > 0;
+        ShowPath.interactable = graph != null
+            && inputSimpulAwal.text?.Length > 0 && inputSimpulTujuan.text?.Length > 0
+            && nodes.ContainsKey(inputSimpulAwal.text) && nodes.ContainsKey(inputSimpulTujuan.text);
     }
 
     void ReadFile(string fileName) {
@@ -86,9 +89,7 @@ public class FileManager : MonoBehaviour {
                     }
                     lineNum++;
                 }
-
-                Debug.Log($"nodes: {graph.NodeCount}, edges: {graph.EdgeCount}");
-                foreach(MapNode n in graph.Nodes()) Debug.Log(n.ToString());
+                Debug.Log($"Successfully read {graph.NodeCount} nodes and {graph.EdgeCount} edges.");
             } catch(FileNotFoundException e) {
                 // Handle file not found here
                 Debug.LogException(e);
@@ -116,15 +117,42 @@ public class FileManager : MonoBehaviour {
         string endNode = inputSimpulTujuan.text;
 
         // Handle show path here
+        GraphTraversalAlgorithm<MapNode>
+            ucs = new GraphTraversalAlgorithm<MapNode>(graph, true) {
+                GFunction = info => info.ExpandNode.GCost + info.ExpandEdge.Data,
+                HFunction = info => 0d
+            },
+            astar = new GraphTraversalAlgorithm<MapNode>(graph, true) {
+                GFunction = info => info.ExpandNode.GCost + info.ExpandEdge.Data,
+                HFunction = info => info.ExpandEdge.To.DistanceTo(info.End)
+            };
+
+        MapNode[]
+            ucsPath = ucs.FindPath(nodes[startNode], nodes[endNode]),
+            astarPath = astar.FindPath(nodes[startNode], nodes[endNode]);
+
+        Debug.Log(ucsPath != null ? $"Found path with UCS: {string.Join<MapNode>(" -> ", ucsPath)}" : "Found no path with UCS.");
+        Debug.Log(astarPath != null ? $"Found path with A*: {string.Join<MapNode>(" -> ", astarPath)}" : "Found no path with A*.");
     }
 }
 
 class MapNode {
+    public static double EarthRadius => 6378137d;
+
     public string Name { get; private set; }
     public (double x, double y) Coordinate { get; private set; }
     public MapNode(string name, double latitude, double longitude) {
         Name = name;
         Coordinate = (latitude, longitude);
+    }
+
+    public double DistanceTo(MapNode other) {
+        const double Deg2Rad = Math.PI / 180d;
+        double dLat = (other.Coordinate.x - Coordinate.x) * Deg2Rad;
+        double dLon = (other.Coordinate.y - Coordinate.y) * Deg2Rad;
+        double sinLat = Math.Sin(dLat / 2d);
+        double sinLon = Math.Sin(dLon / 2d);
+        return 2d * EarthRadius * Math.Asin(Math.Sqrt(sinLat * sinLat + Math.Cos(Coordinate.x * Deg2Rad) * Math.Cos(other.Coordinate.y * Deg2Rad) * sinLon * sinLon));
     }
 
     public override bool Equals(object obj) {
