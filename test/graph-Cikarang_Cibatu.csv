@@ -1,0 +1,34 @@
+#, Node coordinate is in lon-lat format
+N,107.159511,-6.3368296,MH. Thamrin A
+N,107.1621073,-6.3370003,MH. Thamrin B
+N,107.1536858,-6.3346411,Bundaran MH. Thamrin-Sriwijaya
+N,107.1536028,-6.3427309,Bundaran Sriwijaya-Majapahit
+N,107.1616924,-6.3481834,Bundaran Majapahit-Mataram
+N,107.1696853,-6.3418601,Orange County Blvd. A
+N,107.1660642,-6.3408034,Orange County Blvd. B
+N,107.1644193,-6.3393646,Orange County Blvd. C
+N,107.1646018,-6.3367656,Orange County Blvd. D
+N,107.1648003,-6.334649,Orange County Blvd. E
+N,107.1619786,-6.334681,Orange County Blvd. F
+N,107.1659,-6.3360672,Bundaran MH. Thamrin-OC Blvd.
+N,107.162113,-6.333583,Gerbang Tol Cibatu
+E,Bundaran MH. Thamrin-Sriwijaya,Bundaran Sriwijaya-Majapahit,901,undirected
+E,Bundaran Sriwijaya-Majapahit,Bundaran Majapahit-Mataram,1080,undirected
+E,Bundaran Majapahit-Mataram,Orange County Blvd. A,1190,undirected
+E,Bundaran MH. Thamrin-Sriwijaya,MH. Thamrin A,842,undirected
+E,MH. Thamrin A,MH. Thamrin B,290,undirected
+E,MH. Thamrin A,Orange County Blvd. F,501,undirected
+E,MH. Thamrin B,Bundaran MH. Thamrin-OC Blvd.,435,undirected
+E,Orange County Blvd. A,Orange County Blvd. B,418,undirected
+E,Orange County Blvd. B,Orange County Blvd. C,254,undirected
+E,Orange County Blvd. C,Orange County Blvd. D,295,undirected
+E,Orange County Blvd. B,Orange County Blvd. D,603,undirected
+E,Orange County Blvd. D,Orange County Blvd. E,237,undirected
+E,Orange County Blvd. E,Bundaran MH. Thamrin-OC Blvd.,231,undirected
+E,Orange County Blvd. E,MH. Thamrin B,506,directed
+E,MH. Thamrin B,Orange County Blvd. F,274,directed
+E,Bundaran MH. Thamrin-OC Blvd.,Orange County Blvd. B,528,undirected
+E,Bundaran MH. Thamrin-OC Blvd.,Orange County Blvd. D,224,undirected
+E,Orange County Blvd. C,Orange County Blvd. F,596,undirected
+E,Orange County Blvd. F,Gerbang Tol Cibatu,123,undirected
+E,Gerbang Tol Cibatu,Orange County Blvd. E,641,directed
