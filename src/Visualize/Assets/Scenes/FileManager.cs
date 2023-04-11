@@ -28,10 +28,77 @@ public class FileManager : MonoBehaviour {
     void ReadFile(string fileName) {
         StreamReader reader = null;
         try {
-            reader = new StreamReader(fileName);
-            // Handle file read here
-        } catch(Exception e) {
-            // Handle error here
+            int lineNum = 1;
+            try {
+                reader = new StreamReader(fileName);
+                graph = new DirectedGraph<MapNode, double>();
+                nodes.Clear();
+
+                // Handle file read here
+                while(!reader.EndOfStream) {
+                    string lineStr = reader.ReadLine();
+                    string[] columns = lineStr.Split(',');
+
+                    //bool matrixInput = false;
+                    switch(columns[0]) {
+                        case "N":
+                            // Read node data in lon-lat format
+                            double lat = double.Parse(columns[2]);
+                            double lon = double.Parse(columns[1]);
+                            string name = columns[3];
+
+                            MapNode node = new MapNode(name, lat, lon);
+                            nodes.Add(name, node);
+                            graph.AddNode(node);
+
+                            break;
+                        case "E":
+                            // Read edge data
+                            string from = columns[1];
+                            string to = columns[2];
+                            double cost = double.Parse(columns[3]);
+                            string kind = columns[4];
+
+                            switch(kind) {
+                                case "directed":
+                                    graph.AddEdge(nodes[from], nodes[to], cost);
+                                    break;
+                                case "undirected":
+                                    graph.AddEdge(nodes[from], nodes[to], cost);
+                                    graph.AddEdge(nodes[to], nodes[from], cost);
+                                    break;
+                                default:
+                                    // Invalid line
+                                    throw new InvalidDataException($"Invalid file format, error at line {lineNum}: Invalid edge type '{kind}'.");
+                            }
+
+                            break;
+                        case "M":
+                            // Read matrix row
+                            // TODO: Add
+                            break;
+                        case "#":
+                            // Comment line
+                            break;
+                        default:
+                            // Invalid line
+                            throw new InvalidDataException($"Invalid file format, error at line {lineNum}: Invalid line ID '{columns[0]}'.");
+                    }
+                    lineNum++;
+                }
+
+                Debug.Log($"nodes: {graph.NodeCount}, edges: {graph.EdgeCount}");
+                foreach(MapNode n in graph.Nodes()) Debug.Log(n.ToString());
+            } catch(FileNotFoundException e) {
+                // Handle file not found here
+                Debug.LogException(e);
+            } catch(Exception e) {
+                throw e is InvalidDataException ? e : new InvalidDataException($"Invalid file format, error at line {lineNum}: {e.Message}");
+            }
+        } catch(InvalidDataException e) {
+            // Handle invalid file format here
+            graph = null;
+            nodes.Clear();
             Debug.LogException(e);
         } finally {
             reader?.Close();
@@ -66,5 +133,9 @@ class MapNode {
 
     public override int GetHashCode() {
         return Name.GetHashCode();
+    }
+
+    public override string ToString() {
+        return $"{Coordinate}: {Name}";
     }
 }
