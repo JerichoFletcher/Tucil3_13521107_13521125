@@ -9,18 +9,29 @@ using PathfindAllDay.Algorithms;
 using System.Text;
 
 public class FileManager : MonoBehaviour {
+    [Header("Events")]
     public Button ShowMap;
     public Button ShowPath;
+    [Header("Text Fields")]
     public TMP_InputField inputSimpulAwal;
     public TMP_InputField inputSimpulTujuan;
     public TMP_InputField inputFileGraph;
     public TMP_Text outputJarakHasil;
-    public GameObject nodePrefab;
-    public GameObject edgePrefab;
+    [Header("Draw Bounds")]
+    public Boundary ucsDrawArea;
+    public Boundary astarDrawArea;
+    [Header("Draw Options")]
+    public Color defaultEdgeColor;
+    public Gradient pathEdgeColor;
+    [Header("Prefabs")]
+    public NodePrefab nodePrefab;
+    public EdgePrefab edgePrefab;
 
     private DirectedGraph<MapNode, double> graph = null;
-    private readonly List<GameObject> nodeObjects = new List<GameObject>();
-    private readonly List<GameObject> edgeObjects = new List<GameObject>();
+    private readonly Dictionary<string, GameObject> ucsNodeObjects = new Dictionary<string, GameObject>();
+    private readonly Dictionary<string, GameObject> astNodeObjects = new Dictionary<string, GameObject>();
+    private readonly Dictionary<string, GameObject> ucsEdgeObjects = new Dictionary<string, GameObject>();
+    private readonly Dictionary<string, GameObject> astEdgeObjects = new Dictionary<string, GameObject>();
     private readonly Dictionary<string, MapNode> nodes = new Dictionary<string, MapNode>();
     private readonly List<string> nodeNames = new List<string>();
     private readonly Dictionary<string, string> inputOptions = new Dictionary<string, string>();
@@ -39,6 +50,8 @@ public class FileManager : MonoBehaviour {
     private const string
         argEdgeDirected = "directed",
         argEdgeUndirected = "undirected";
+
+    private string EdgeHash(MapNode from, MapNode to) => $"{from.Name}-{to.Name}";
 
     private void Update() {
         ShowMap.interactable = inputFileGraph.text?.Length > 0;
@@ -121,7 +134,7 @@ public class FileManager : MonoBehaviour {
 
                         break;
                     case "E":
-                        if(!inputOptions.ContainsKey(optEdgeFormat))throw new InvalidDataException($"{errMsgHead(lineNum)}: Missing option '{optEdgeFormat}' needed to parse edge data.");
+                        if(!inputOptions.ContainsKey(optEdgeFormat)) throw new InvalidDataException($"{errMsgHead(lineNum)}: Missing option '{optEdgeFormat}' needed to parse edge data.");
 
                         // Read edge data in determined format
                         string edgeFmt = inputOptions[optEdgeFormat];
@@ -178,39 +191,111 @@ public class FileManager : MonoBehaviour {
             outputJarakHasil.text = "Berhasil membuka file!";
             outputJarakHasil.color = Color.green;
 
-#if UNITY_EDITOR
+            Visualize();
+
             StringBuilder str = new StringBuilder(" | ");
             foreach(KeyValuePair<string, MapNode> pair in nodes) {
                 str.Append(pair.Key + " | ");
             }
             Debug.Log($"Successfully read {graph.NodeCount} nodes and {graph.EdgeCount} edges:\n{str}");
-#endif
         } catch(IOException e) {
             // Handle file read error here
-#if UNITY_EDITOR
             Debug.LogError($"Failed to read file: {e}");
-#endif
             outputJarakHasil.text = "Gagal membaca file!";
             outputJarakHasil.color = Color.red;
             graph = null;
+            ClearVisualization();
         } catch(InvalidDataException e) {
             // Handle invalid file format here
-#if UNITY_EDITOR
             Debug.LogException(e);
-#endif
             outputJarakHasil.text = "File tidak valid!";
             outputJarakHasil.color = Color.red;
             graph = null;
+            ClearVisualization();
         } catch(Exception e) {
-#if UNITY_EDITOR
             Debug.LogError($"{errMsgHead(lineNum)}: {e.Message}\n{e.StackTrace}");
-#endif
             outputJarakHasil.text = "Terjadi kesalahan!";
             outputJarakHasil.color = Color.red;
             graph = null;
+            ClearVisualization();
         } finally {
             reader?.Close();
         }
+    }
+
+    private void Visualize() {
+        ClearVisualization();
+        static GameObject CreateNode(NodePrefab nodePrefab, MapNode node, Boundary bound, Rect range, bool flipped, string name) {
+            GameObject nodeObj = Instantiate(nodePrefab.gameObject);
+            NodePrefab nodePref = nodeObj.GetComponent<NodePrefab>();
+            nodePref.Bound = bound.ToRect;
+            nodePref.Range = range;
+            if(flipped) {
+                nodePref.Set(node.Name, (float)node.Coordinate.y, (float)node.Coordinate.x);
+            } else {
+                nodePref.Set(node.Name, (float)node.Coordinate.x, (float)node.Coordinate.y);
+            }
+
+            nodeObj.name = $"NodeObj{name}:{node.Name}";
+            return nodeObj;
+        }
+        static GameObject CreateEdge(EdgePrefab edgePrefab, GraphEdge<MapNode, double> edge, Boundary bound, Rect range, bool flipped, string name) {
+            GameObject edgeObj = Instantiate(edgePrefab.gameObject);
+            EdgePrefab edgePref = edgeObj.GetComponent<EdgePrefab>();
+            edgePref.Bound = bound.ToRect;
+            edgePref.Range = range;
+            if(flipped) {
+                edgePref.SetPosition((float)edge.From.Coordinate.y, (float)edge.From.Coordinate.x, (float)edge.To.Coordinate.y, (float)edge.To.Coordinate.x);
+            } else {
+                edgePref.SetPosition((float)edge.From.Coordinate.x, (float)edge.From.Coordinate.y, (float)edge.To.Coordinate.x, (float)edge.To.Coordinate.y);
+            }
+
+            edgeObj.name = $"EdgeObj{name}:{edge.From}->{edge.To}";
+            return edgeObj;
+        }
+
+        // Calculate range
+        (double x, double y) min = (double.MaxValue, double.MaxValue), max = (double.MinValue, double.MinValue);
+        bool flipped = inputOptions[optNodeFormat].Equals(optNodeFormatLonLat) || inputOptions[optNodeFormat].Equals(optNodeFormatYX);
+        foreach(MapNode node in graph.Nodes()) {
+            if(flipped) {
+                if(min.x > node.Coordinate.y) min.x = node.Coordinate.y;
+                if(min.y > node.Coordinate.x) min.y = node.Coordinate.x;
+                if(max.x < node.Coordinate.y) max.x = node.Coordinate.y;
+                if(max.y < node.Coordinate.x) max.y = node.Coordinate.x;
+            } else {
+                if(min.x > node.Coordinate.x) min.x = node.Coordinate.x;
+                if(min.y > node.Coordinate.y) min.y = node.Coordinate.y;
+                if(max.x < node.Coordinate.x) max.x = node.Coordinate.x;
+                if(max.y < node.Coordinate.y) max.y = node.Coordinate.y;
+            }
+        }
+        Rect range = new Rect((float)min.x, (float)min.y, (float)(max.x - min.x), (float)(max.y - min.y));
+
+        // Instantiate objects
+        foreach(MapNode node in graph.Nodes()) {
+            GameObject ucsNodeObj = CreateNode(nodePrefab, node, ucsDrawArea, range, flipped, "UCS");
+            GameObject astNodeObj = CreateNode(nodePrefab, node, astarDrawArea, range, flipped, "Astar");
+            ucsNodeObjects.Add(node.Name, ucsNodeObj);
+            astNodeObjects.Add(node.Name, astNodeObj);
+
+            foreach(GraphEdge<MapNode, double> edge in graph.OutEdges(node)) {
+                if(!ucsEdgeObjects.ContainsKey(EdgeHash(edge.From, edge.To)) && !ucsEdgeObjects.ContainsKey(EdgeHash(edge.To, edge.From))) {
+                    GameObject ucsEdgeObj = CreateEdge(edgePrefab, edge, ucsDrawArea, range, flipped, "UCS");
+                    //Debug.Log($"UCSEDGE: {ucsEdgeObj}");
+                    ucsEdgeObjects.Add(EdgeHash(edge.From, edge.To), ucsEdgeObj);
+                }
+                if(!astEdgeObjects.ContainsKey(EdgeHash(edge.From, edge.To)) && !astEdgeObjects.ContainsKey(EdgeHash(edge.To, edge.From))) {
+                    GameObject astEdgeObj = CreateEdge(edgePrefab, edge, astarDrawArea, range, flipped, "Astar");
+                    //Debug.Log($"ASTEDGE: {astEdgeObj}");
+                    astEdgeObjects.Add(EdgeHash(edge.From, edge.To), astEdgeObj);
+                }
+            }
+        }
+
+        //Debug.Log($"UCSEDGES: {ucsEdgeObjects.Count}, ASTEDGES: {astEdgeObjects.Count}");
+        ResetEdgeColors();
+        Debug.Log($"Instantiated {ucsNodeObjects.Count + astNodeObjects.Count} node and {ucsEdgeObjects.Count + astEdgeObjects.Count} edge objects.");
     }
 
     public void OnShowMap() {
@@ -250,12 +335,72 @@ public class FileManager : MonoBehaviour {
                 astarPathCost += cost;
             }
         }
-
-        outputJarakHasil.text = $"UCS: {ucsPathCost}\nA*: {astarPathCost}";
+        
+        outputJarakHasil.text = $"UCS: {(ucsPath != null ? ucsPathCost : "Not found")}\nA*: {(astarPath != null ? astarPathCost : "Not found")}";
         outputJarakHasil.color = Color.black;
+
+        ResetEdgeColors();
+        if(ucsPath != null) ColorPath(ucsEdgeObjects, ucsPath);
+        if(astarPath != null) ColorPath(astEdgeObjects, astarPath);
 
         Debug.Log(ucsPath != null ? $"Found path with UCS, cost {ucsPathCost}: {string.Join<MapNode>(" -> ", ucsPath)}" : "Found no path with UCS.");
         Debug.Log(astarPath != null ? $"Found path with A*, cost {astarPathCost}: {string.Join<MapNode>(" -> ", astarPath)}" : "Found no path with A*.");
+    }
+
+    private void ClearVisualization() {
+        foreach(GameObject obj in ucsNodeObjects.Values) Destroy(obj);
+        foreach(GameObject obj in astNodeObjects.Values) Destroy(obj);
+        foreach(GameObject obj in ucsEdgeObjects.Values) Destroy(obj);
+        foreach(GameObject obj in astEdgeObjects.Values) Destroy(obj);
+        ucsNodeObjects.Clear();
+        astNodeObjects.Clear();
+        ucsEdgeObjects.Clear();
+        astEdgeObjects.Clear();
+    }
+
+    private void ResetEdgeColors() {
+        foreach(GameObject edgeObj in ucsEdgeObjects.Values) {
+            LineRenderer lineRender = edgeObj.GetComponent<EdgePrefab>().line;
+            lineRender.startColor = defaultEdgeColor;
+            lineRender.endColor = defaultEdgeColor;
+        }
+        foreach(GameObject edgeObj in astEdgeObjects.Values) {
+            LineRenderer lineRender = edgeObj.GetComponent<EdgePrefab>().line;
+            lineRender.startColor = defaultEdgeColor;
+            lineRender.endColor = defaultEdgeColor;
+        }
+    }
+
+    private void ColorPath(Dictionary<string, GameObject> edgeObjects, MapNode[] path) {
+        if(path.Length <= 1) return;
+        for(int i = 0; i < path.Length - 1; i++) {
+            GameObject lineObj = null;
+            if(edgeObjects.TryGetValue(EdgeHash(path[i], path[i + 1]), out lineObj) || edgeObjects.TryGetValue(EdgeHash(path[i + 1], path[i]), out lineObj)) {
+                LineRenderer lineRender = lineObj.GetComponent<EdgePrefab>().line;
+                Color
+                    c1 = pathEdgeColor.Evaluate((float)i / path.GetUpperBound(0)),
+                    c2 = pathEdgeColor.Evaluate((float)(i + 1) / path.GetUpperBound(0));
+                lineRender.startColor = c1;
+                lineRender.endColor = c2;
+            } else {
+                Debug.LogError($"Missing edge object {path[i]} -> {path[i + 1]}");
+            }
+        }
+    }
+
+    private void OnDrawGizmos() {
+        Gizmos.color = Color.blue;
+        Rect
+            ucsRect = ucsDrawArea.ToRect,
+            astRect = astarDrawArea.ToRect;
+        Gizmos.DrawWireCube(ucsRect.center, ucsRect.size);
+        Gizmos.DrawWireCube(astRect.center, astRect.size);
+    }
+
+    [Serializable]
+    public class Boundary {
+        public Transform bottomLeftCorner, topRightCorner;
+        public Rect ToRect => new Rect(bottomLeftCorner.position, (topRightCorner.position - bottomLeftCorner.position));
     }
 }
 

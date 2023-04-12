@@ -1,0 +1,12 @@
+# Node coordinate is in XY format
+O,format=xy,edge=pair
+
+# Nodes
+N,1,1,A
+N,1,3,B
+N,2,2,C
+
+# Edges
+E,A,B,2,undirected
+E,A,C,1.5,directed
+E,C,B,1.5,directed
