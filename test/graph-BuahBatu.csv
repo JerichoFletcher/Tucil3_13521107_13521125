@@ -10,13 +10,23 @@ N,107.6489786,-6.9443565,Cijawura Girang
 N,107.6418074,-6.9459209,Ibrahim Adjie
 N,107.6526999,-6.942156,Soekarno Hatta
 N,107.6518114,-6.9596141,Pandanwangi
-E,Margacinta E,Margacinta D,258,undirected
-E,Margacinta D,Margacinta C,266,undirected
-E,Margacinta C,Margacinta B,265,undirected
-E,Margacinta B,Margacinta A,821,undirected
-E,Margacinta D,Pandanwangi,462,undirected
-E,Margacinta A,Ibrahim Adjie,930,undirected
-E,Soekarno Hatta,Ibrahim Adjie,1290,directed
-E,Margacinta C,Margaluyu Barat,332,undirected
-E,Margaluyu Barat,Soekarno Hatta,1220,undirected
-E,Margacinta B,Cijawura Girang,1220,undirected
+E,0    821  0    0    0    0    0    930  0    0
+E,821  0    265  0    0    0    1220 0    0    0
+E,0    265  0    266  0    332  0    0    0    0
+E,0    0    266  0    258  0    0    0    0    462
+E,0    0    0    258  0    0    0    0    0    0
+E,0    0    332  0    0    0    0    0    1220 0
+E,0    1220 0    0    0    0    0    0    0    0
+E,930  0    0    0    0    0    0    0    1290 0
+E,0    0    0    0    0    0    0    1290 0    0
+E,0    0    0    462  0    0    0    0    0    0
+#E,Margacinta E,Margacinta D,258,undirected
+#E,Margacinta D,Margacinta C,266,undirected
+#E,Margacinta C,Margacinta B,265,undirected
+#E,Margacinta B,Margacinta A,821,undirected
+#E,Margacinta D,Pandanwangi,462,undirected
+#E,Margacinta A,Ibrahim Adjie,930,undirected
+#E,Soekarno Hatta,Ibrahim Adjie,1290,directed
+#E,Margacinta C,Margaluyu Barat,332,undirected
+#E,Margaluyu Barat,Soekarno Hatta,1220,undirected
+#E,Margacinta B,Cijawura Girang,1220,undirected
