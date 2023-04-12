@@ -10,26 +10,16 @@ N,106.0576071,-6.0319271,KH. M. Sadeli
 N,106.0659102,-6.0319271,Bunderan Perumnas
 N,106.0709099,-5.997197,Bojonegara
 N,106.0492974,-5.9896366,Kali Gandu
-E,0    749  0    0    0    0    0    0    0    2630
-E,749  0    821  0    3590 0    0    0    0    0
-E,0    821  0    3320 0    0    1630 0    3050 0
-E,0    0    3320 0    0    4320 0    2450 0    0
-E,0    3590 0    0    0    2080 0    0    0    0
-E,0    0    0    4320 2080 0    2460 0    0    0
-E,0    0    1630 0    0    2460 0    1020 0    0
-E,0    0    0    2450 0    0    1020 0    0    0
-E,0    0    3050 0    0    0    0    0    0    2610
-E,2630 0    0    0    0    0    0    0    2610 0
-#E,Raya Pantura A,Raya Pantura B,749,undirected
-#E,Raya Pantura B,Raya Pantura C,821,undirected
-#E,Raya Pantura C,Raya Pantura D,3320,undirected
-#E,Raya Pantura D,Bunderan Perumnas,2450,undirected
-#E,Bunderan Perumnas,KH. M. Sadeli,1020,undirected
-#E,KH. M. Sadeli,Lingkar Selatan B,2460,undirected
-#E,Raya Pantura D,Lingkar Selatan B,4320,undirected
-#E,Lingkar Selatan B,Lingkar Selatan A,2080,undirected
-#E,Lingkar Selatan A,Raya Pantura B,3590,undirected
-#E,KH. M. Sadeli,Raya Pantura C,1630,undirected
-#E,Raya Pantura C,Bojonegara,3050,undirected
-#E,Bojonegara,Kali Gandu,2610,undirected
-#E,Kali Gandu,Raya Pantura A,2630,undirected
+E,Raya Pantura A,Raya Pantura B,749,undirected
+E,Raya Pantura B,Raya Pantura C,821,undirected
+E,Raya Pantura C,Raya Pantura D,3320,undirected
+E,Raya Pantura D,Bunderan Perumnas,2450,undirected
+E,Bunderan Perumnas,KH. M. Sadeli,1020,undirected
+E,KH. M. Sadeli,Lingkar Selatan B,2460,undirected
+E,Raya Pantura D,Lingkar Selatan B,4320,undirected
+E,Lingkar Selatan B,Lingkar Selatan A,2080,undirected
+E,Lingkar Selatan A,Raya Pantura B,3590,undirected
+E,KH. M. Sadeli,Raya Pantura C,1630,undirected
+E,Raya Pantura C,Bojonegara,3050,undirected
+E,Bojonegara,Kali Gandu,2610,undirected
+E,Kali Gandu,Raya Pantura A,2630,undirected
