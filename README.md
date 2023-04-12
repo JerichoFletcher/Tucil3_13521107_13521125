@@ -26,7 +26,6 @@ Buka executable file *Pathfind All Day.exe* yang terdapat pada folder bin.
 2. Tekan tombol *SHOW MAP* untuk mengecek apakah format input sudah sesuai, jika sudah sesuai maka program akan menampilkan input dalam bentuk graf.
 3. Masukkan *Simpul Awal* yaitu tempat awal sesuai yang ada di file terpilih dan *Simpul Tujuan* yaitu tempat yang akan dikunjungi. 
 4. Tekan tombol *SHOW PATH* pada program untuk menunjukan lintasan terpendek menggunakan algoritma UCS dan A*.
-5. Kemudian, program akan menunjukkan *Shortest Path* yang menunjukkan simpul yang dikunjungi untuk mendapatkan lintasan terpendek dan *Visited Nodes* yang menunjukkan simpul mana saja yang telah dikunjungi.
 
 ## Authors
 
